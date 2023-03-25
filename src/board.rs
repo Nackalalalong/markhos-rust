@@ -1,6 +1,6 @@
 use colored::*;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum MarkerSymbol {
     O,
     X
@@ -36,8 +36,8 @@ impl Cell {
         match &self.marker {
             Some(marker) => {
                 s = match marker.symbol {
-                    MarkerSymbol::O => " O ",
-                    MarkerSymbol::X => " X "
+                    MarkerSymbol::O => if marker.is_ultra_instinct {" O "} else {" o "},
+                    MarkerSymbol::X => if marker.is_ultra_instinct {" X "} else {" x "}
                 }
             },
             None => ()
@@ -153,7 +153,7 @@ impl Board {
         || x_diff != y_diff
         || (
             !self.cells[from_r][from_c].marker.unwrap().is_ultra_instinct 
-            && x_diff + y_diff > 2
+            && (x_diff + y_diff > 2 || to_r > from_r)
         )
         {
             return false;
@@ -167,7 +167,34 @@ impl Board {
         old_cell.unfocus();
 
         let marker = old_cell.remove_marker();
+        if to_r == 0 && marker.is_some() {
+            marker.unwrap().is_ultra_instinct = true;
+        }
         self.cells[to_r][to_c].marker = marker;
+    }
+
+    pub fn must_eat(&self, owner_marker: &Marker) -> bool {
+        todo!();
+
+        for (r,row) in self.cells.iter().enumerate() {
+            for (c, cell) in row.iter().enumerate() {
+                if cell.marker.is_none() {
+                    continue;
+                }
+
+                let symbol = &cell.marker.unwrap().symbol;
+                if symbol == &owner_marker.symbol {
+                    if owner_marker.is_ultra_instinct {
+
+                    }
+                    else if r > 1 {
+                        
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     pub fn is_cell_filled(&self, r: usize, c: usize) -> bool {
