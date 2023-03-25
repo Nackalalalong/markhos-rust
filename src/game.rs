@@ -111,10 +111,12 @@ impl Game {
                     }
                 },
                 GameState::WaitingForMoveTarget => {
-                    if self.board.is_cell_filled(new_r, new_c) && !self.board.is_cell_has_marker(new_r, new_c) {
-                        self.board.move_cell(old_r, old_c, new_r, new_c);
-                        self.preparedCell = None;
+                    let from_cell = self.preparedCell.unwrap();
+                    let can_move = self.board.can_marker_move(from_cell.r, from_cell.c, new_r, new_c);
+                    if can_move {
+                        self.board.move_marker(from_cell.r, from_cell.c, new_r, new_c);
                         self.state = GameState::WaitingForMarkerSelection;
+                        self.preparedCell = None;
                     }
                 }
             }

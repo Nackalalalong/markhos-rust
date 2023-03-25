@@ -137,8 +137,36 @@ impl Board {
         self.cells[r][c].prepare_to_move();
     }
 
-    pub fn move_cell(&mut self, from_r: usize, from_c: usize, to_r: usize, to_c: usize) {
-        let marker = self.cells[from_r][from_c].remove_marker();
+    pub fn get_diffs(&self, r1: usize, c1: usize, r2: usize, c2: usize) -> (usize,usize) {
+        let x_diff = if r1 > r2 {r1 - r2} else {r2 - r1};
+        let y_diff = if c1 > c2 {c1 - c2} else {c2 - c1};
+        (x_diff, y_diff)
+    }
+
+    pub fn can_marker_move(&self, from_r: usize, from_c: usize, to_r: usize, to_c: usize) -> bool {
+
+        let (x_diff, y_diff) = self.get_diffs(from_r, from_c, to_r, to_c);
+
+        if !self.is_cell_filled(to_r, to_c)
+        || self.is_cell_has_marker(to_r, to_c)
+        || self.cells[from_r][from_c].marker.is_none()
+        || x_diff != y_diff
+        || (
+            !self.cells[from_r][from_c].marker.unwrap().is_ultra_instinct 
+            && x_diff + y_diff > 2
+        )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    pub fn move_marker(&mut self, from_r: usize, from_c: usize, to_r: usize, to_c: usize) {
+        let old_cell = &mut self.cells[from_r][from_c];
+        old_cell.unfocus();
+
+        let marker = old_cell.remove_marker();
         self.cells[to_r][to_c].marker = marker;
     }
 
